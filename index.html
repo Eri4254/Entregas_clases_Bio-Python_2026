@@ -185,6 +185,51 @@
       text-align: center;
       padding: 40px;
     }
+
+    .error-message {
+      color: #ff6b6b;
+      background: rgba(255, 107, 107, 0.1);
+      padding: 15px;
+      border-radius: 8px;
+      border: 1px solid #ff6b6b;
+      margin: 10px 0;
+    }
+
+    .intro-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 40px;
+      background: var(--card-bg);
+      border-radius: 12px;
+      border: 1px solid var(--card-border);
+    }
+
+    .intro-content .avatar {
+      font-size: 4rem;
+      margin-bottom: 20px;
+    }
+
+    .intro-content h2 {
+      font-size: 2rem;
+      margin-bottom: 10px;
+      color: var(--text);
+    }
+
+    .intro-content p {
+      font-size: 1.1rem;
+      color: var(--text-dim);
+      max-width: 500px;
+      line-height: 1.6;
+    }
+
+    .intro-content .highlight {
+      color: var(--accent);
+      font-weight: 600;
+    }
   </style>
 </head>
 <body>
@@ -202,7 +247,31 @@
     const tabsEl = document.getElementById("tabs");
     const contentEl = document.getElementById("content");
 
+    // Función para verificar si un PDF existe
+    function pdfExists(semana) {
+      return new Promise((resolve) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('HEAD', `semana ${semana}.pdf`, true);
+        xhr.onload = function() {
+          resolve(xhr.status === 200);
+        };
+        xhr.onerror = function() {
+          resolve(false);
+        };
+        xhr.send();
+      });
+    }
+
     function buildTabs() {
+      // Botón de Introducción
+      const introBtn = document.createElement("button");
+      introBtn.className = "tab-btn";
+      introBtn.dataset.tab = "intro";
+      introBtn.innerHTML = `<span class="tab-num">📖</span> Introducción`;
+      introBtn.addEventListener("click", () => activateTab("intro"));
+      tabsEl.appendChild(introBtn);
+
+      // Botones de entregas
       for (let i = 1; i <= TOTAL_ENTREGAS; i++) {
         const btn = document.createElement("button");
         btn.className = "tab-btn";
@@ -214,138 +283,118 @@
     }
 
     function buildPanels() {
+      // Panel de Introducción
+      const introPanel = document.createElement("section");
+      introPanel.className = "panel";
+      introPanel.id = "panel-intro";
+      introPanel.innerHTML = `
+        <div class="panel-header">
+          <h2>👋 Bienvenido</h2>
+          <p>Introducción al portafolio de entregas</p>
+        </div>
+        <div class="intro-content">
+          <div class="avatar">🧬</div>
+          <h2>Me llamo <span class="highlight">Andrés</span></h2>
+          <p>Soy estudiante de pregrado en <span class="highlight">Bio 2026</span>.</p>
+          <p style="margin-top: 15px; font-size: 0.95rem; color: var(--text-dim);">
+            Este espacio contiene mis entregas del curso de Programación Bio-Python.
+          </p>
+        </div>
+      `;
+      contentEl.appendChild(introPanel);
+
+      // Paneles de entregas
       for (let i = 1; i <= TOTAL_ENTREGAS; i++) {
         const panel = document.createElement("section");
         panel.className = "panel";
         panel.id = `panel-${i}`;
 
-        if (i === 1) {
-          // Panel 1: muestra el contenido extraído del PDF "semana 1.pdf"
-          panel.innerHTML = `
-            <div class="panel-header">
-              <h2>📘 Entrega 1 — Semana 1</h2>
-              <p>Contenido extraído del archivo <code>semana 1.pdf</code></p>
-            </div>
-            <div style="flex:1; overflow-y:auto; background: var(--card-bg); border-radius: 12px; border: 1px solid var(--card-border); padding: 20px; font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6; white-space: pre-wrap; color: #cfd4e6;">
-              <div style="color: var(--accent); font-weight: 600; margin-bottom: 12px;">📄 COSAS IMPORTANTES</div>
-              • Las palabras con espacios generalmente se deben conectar con <span style="color: #f7c948;">_barritas_bajas</span><br>
-              • Cuando se hace print con variables, se debe poner una <span style="color: #f7c948;">f</span> justo después del primer paréntesis, para que el coso entienda que la<br>
-              • Las variables se crean así: <span style="color: #f7c948;">[nombre] = [resultado de la variable]</span><br><br>
-
-              <span style="color: #6c8cff;"># Print normal</span><br>
-              print("¡Hola, mundo desde Google Colab!")<br>
-              print("Python es increíble")<br>
-              print("¡Estoy aprendiendo a programar!")<br><br>
-
-              <span style="color: #6c8cff;"># Variables</span><br>
-              nombre = "Pepito"<br>
-              edad = 54<br>
-              ciudad = "Medellín"<br>
-              lenguaje_favorito = "Python!"<br><br>
-
-              print(f"Hola, soy {nombre}")<br>
-              print(f"Tengo (edad) años")<br>
-              print(f"Vivo en (ciudad)")<br>
-              print(f"Mi lenguaje favorito es {lenguaje_favorito}")<br><br>
-
-              <span style="color: #6c8cff;"># Algunas veces, el código funciona sin tener que poner la variable antes, porque las recuerda de una</span><br>
-              print(f"Hola, soy {nombre}. Tengo (edad) años")<br><br>
-
-              <span style="color: #6c8cff;"># chatgpt lo hizo de una forma diferente</span><br>
-              A1 = "Ana"<br>
-              A2 = 25<br>
-              print (" Nombre : ", nombre , " Edad : ", edad )<br><br>
-
-              <span style="color: #6c8cff;"># Variables pueden tener nombres diferentes</span><br>
-              print(f"hola! soy (A1) y tengo (A2) de edad")<br><br>
-
-              <span style="color: #6c8cff;"># Ensayo variables con operaciones matemáticas</span><br>
-              <span style="color: #6c8cff;"># Hay ** y % que son potenciación y el residuo de una división (dudo que lo usemos)</span><br>
-              AB = 2+2<br>
-              Wou = 2*10+40/2<br><br>
-
-              print(f"suma ensayo (AB)")<br>
-              print(f"operación un poquito más complicada (Wou)")<br>
-              print("ensayo con texto normal 3+3")<br>
-              print("texto normal CON variables que no están de antes 5 + 5 = (5 + 5)")<br>
-              print(f"texto normal CON f y variables que no están de antes 5 + 5 = (5 + 5)")<br><br>
-
-              <span style="color: #6c8cff;"># La f es lo que hace que el último ejemplo funcione</span><br><br>
-
-              <span style="color: #f7c948;">▶ SALIDA:</span><br>
-              suma ensayo 4<br>
-              operación un poquito más complicada 40.0<br>
-              ensayo con texto normal 3+3<br>
-              texto normal CON variables que no están de antes 5 + 5 = (5 + 5)<br>
-              texto normal CON f y variables que no están de antes 5 + 5 = 10<br><br>
-
-              <hr style="border-color: #2a2f40; margin: 16px 0;">
-
-              <span style="color: #6c8cff;"># Así se hacen variables que se pueden rellenar en la respuesta</span><br>
-              nombre = input("¿Cuál es tu nombre?")<br>
-              print(f"¡Bienvenido a Python, {nombre}!")<br><br>
-
-              <span style="color: #6c8cff;"># Ensayo: crear algo con dos inputs (me quedó malo, corrección abajo)</span><br>
-              print("halla dos números cuya división no deje residuos")<br>
-              A = input("primer número:")<br>
-              B = input("Segundo número:")<br>
-              print(f"A % B = {A%B}")<br><br>
-
-              <span style="color: #f7c948;">▶ Error:</span> TypeError: not all arguments converted during string formatting<br><br>
-
-              <span style="color: #6c8cff;"># Este lo corrigió la IA, no sé qué hice mal arriba</span><br>
-              print("halla dos números cuya división no deje residuos")<br>
-              A_str = input("primer número:")<br>
-              B_str = input("Segundo número:")<br>
-              A = int(A_str)<br>
-              B = int(B_str)<br>
-              print(f"A % B = {A%B}")<br><br>
-
-              <span style="color: #f7c948;">▶ SALIDA CORREGIDA:</span><br>
-              halla dos números cuya división no deje residuos<br>
-              primer número:5<br>
-              Segundo número:1<br>
-              5%1 = 0
-            </div>
-            <div class="pdf-fallback">
-              ⚡ Este contenido ha sido extraído de <strong>semana 1.pdf</strong>. 
-              Puedes consultar el archivo original si lo prefieres.
-            </div>
-          `;
-        } else {
-          panel.innerHTML = `
-            <div class="panel-header">
-              <h2>Entrega ${i}</h2>
-              <p>Contenido pendiente por agregar</p>
-            </div>
-            <div class="empty-card">Aún no se ha añadido contenido para esta entrega.</div>
-          `;
-        }
+        pdfExists(i).then(exists => {
+          if (exists) {
+            panel.innerHTML = `
+              <div class="panel-header">
+                <h2>📘 Entrega ${i} — Semana ${i}</h2>
+                <p>Visualizando archivo: <code>semana ${i}.pdf</code></p>
+              </div>
+              <div class="pdf-wrapper">
+                <embed src="semana ${i}.pdf" type="application/pdf" />
+              </div>
+              <div class="pdf-fallback">
+                ⚡ Si no puedes visualizar el PDF, puedes 
+                <a href="semana ${i}.pdf" target="_blank">descargarlo aquí</a>.
+              </div>
+            `;
+          } else {
+            panel.innerHTML = `
+              <div class="panel-header">
+                <h2>📘 Entrega ${i} — Semana ${i}</h2>
+                <p>Archivo no encontrado</p>
+              </div>
+              <div class="empty-card">
+                <div>
+                  <div style="font-size: 2rem; margin-bottom: 10px;">📄</div>
+                  <p>El archivo <strong>semana ${i}.pdf</strong> no se encuentra disponible.</p>
+                  <p style="font-size: 0.85rem; margin-top: 10px;">Asegúrate de que el archivo exista en el directorio.</p>
+                </div>
+              </div>
+            `;
+          }
+        });
 
         contentEl.appendChild(panel);
       }
     }
 
     function activateTab(n) {
+      // Activar pestaña
       document.querySelectorAll(".tab-btn").forEach((btn) => {
-        btn.classList.toggle("active", Number(btn.dataset.tab) === n);
+        const isActive = (btn.dataset.tab === String(n));
+        btn.classList.toggle("active", isActive);
       });
+
+      // Activar panel
       document.querySelectorAll(".panel").forEach((panel) => {
-        panel.classList.toggle("active", panel.id === `panel-${n}`);
+        const panelId = panel.id;
+        let targetId;
+
+        if (n === "intro") {
+          targetId = "panel-intro";
+        } else {
+          targetId = `panel-${n}`;
+        }
+
+        panel.classList.toggle("active", panelId === targetId);
       });
-      window.location.hash = `entrega-${n}`;
+
+      // Actualizar hash (para la introducción usamos un hash especial)
+      if (n === "intro") {
+        window.location.hash = "intro";
+      } else {
+        window.location.hash = `entrega-${n}`;
+      }
     }
 
     function init() {
       buildTabs();
       buildPanels();
 
-      const hashMatch = window.location.hash.match(/entrega-(\d+)/);
-      const initial = hashMatch && Number(hashMatch[1]) >= 1 && Number(hashMatch[1]) <= TOTAL_ENTREGAS
-        ? Number(hashMatch[1])
-        : 1;
+      const hash = window.location.hash.replace('#', '');
+      let initial;
 
-      activateTab(initial);
+      if (hash === "intro") {
+        initial = "intro";
+      } else {
+        const hashMatch = hash.match(/entrega-(\d+)/);
+        if (hashMatch && Number(hashMatch[1]) >= 1 && Number(hashMatch[1]) <= TOTAL_ENTREGAS) {
+          initial = Number(hashMatch[1]);
+        } else {
+          initial = "intro"; // Por defecto, mostrar introducción
+        }
+      }
+
+      setTimeout(() => {
+        activateTab(initial);
+      }, 100);
     }
 
     init();
